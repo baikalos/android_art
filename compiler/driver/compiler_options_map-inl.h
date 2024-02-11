@@ -210,7 +210,7 @@ inline void AddCompilerOptionsArgumentParserOptions(Builder& b) {
           .IntoKey(Map::TopKProfileThreshold)
 
       .Define({"--abort-on-hard-verifier-error", "--no-abort-on-hard-verifier-error"})
-          .WithValues({true, false})
+          .WithValues({false, false})
           .IntoKey(Map::AbortOnHardVerifierFailure)
       .Define({"--abort-on-soft-verifier-error", "--no-abort-on-soft-verifier-error"})
           .WithValues({true, false})

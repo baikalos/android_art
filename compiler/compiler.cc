@@ -17,6 +17,7 @@
 #include "compiler.h"
 
 #include <android-base/logging.h>
+#include <android-base/properties.h>
 
 #include "base/macros.h"
 #include "base/utils.h"
@@ -32,6 +33,7 @@ Compiler* Compiler::Create(const CompilerOptions& compiler_options,
                            Compiler::Kind kind) {
   // Check that oat version when runtime was compiled matches the oat version of the compiler.
   constexpr std::array<uint8_t, 4> compiler_oat_version = OatHeader::kOatVersion;
+  increase_max_method_size_ = android::base::GetBoolProperty("persist.baikal.art.inc_max", false);
   OatHeader::CheckOatVersion(compiler_oat_version);
   switch (kind) {
     case kQuick:
@@ -54,13 +56,13 @@ bool Compiler::IsPathologicalCase(const dex::CodeItem& code_item,
    * of that, which also guarantees we cannot overflow our 16-bit internal Quick SSA name space.
    */
   CodeItemDataAccessor accessor(dex_file, &code_item);
-  if (accessor.InsnsSizeInCodeUnits() >= UINT16_MAX / 4) {
+  if (accessor.InsnsSizeInCodeUnits() >= UINT16_MAX / (increase_max_method_size_ ? 2 : 4)) {
     LOG(INFO) << "Method exceeds compiler instruction limit: "
               << accessor.InsnsSizeInCodeUnits()
               << " in " << dex_file.PrettyMethod(method_idx);
     return true;
   }
-  if (accessor.RegistersSize() >= UINT16_MAX / 4) {
+  if (accessor.RegistersSize() >= UINT16_MAX / (increase_max_method_size_ ? 2 : 4)) {
     LOG(INFO) << "Method exceeds compiler virtual register limit: "
               << accessor.RegistersSize() << " in " << dex_file.PrettyMethod(method_idx);
     return true;

@@ -118,6 +118,7 @@ class Compiler {
   const CompilerOptions& compiler_options_;
   CompiledMethodStorage* const storage_;
   const uint64_t maximum_compilation_time_before_warning_;
+  inline static bool increase_max_method_size_;
 
   DISALLOW_COPY_AND_ASSIGN(Compiler);
 };

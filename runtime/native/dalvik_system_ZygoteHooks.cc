@@ -180,8 +180,13 @@ static uint32_t EnableDebugFeatures(uint32_t runtime_flags) {
     runtime_flags &= ~DEBUG_ENABLE_JNI_LOGGING;
   }
 
+  if( (runtime_flags & DEBUG_ENABLE_JDWP) != 0 ) {
+      LOG(INFO) << "EnableDebugFeatures:DEBUG_ENABLE_JDWP";
+  }
+
   Dbg::SetJdwpAllowed((runtime_flags & DEBUG_ENABLE_JDWP) != 0);
   runtime_flags &= ~DEBUG_ENABLE_JDWP;
+
 
   const bool safe_mode = (runtime_flags & DEBUG_ENABLE_SAFEMODE) != 0;
   if (safe_mode) {

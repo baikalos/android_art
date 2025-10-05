@@ -97,7 +97,7 @@ static uint16_t CappedAllocRecordCount(size_t alloc_record_count) {
 }
 
 // JDWP is allowed unless the Zygote forbids it.
-static bool gJdwpAllowed = true;
+static bool gJdwpAllowed = false;
 
 static bool gDdmThreadNotification = false;
 
@@ -129,6 +129,7 @@ void Dbg::GcDidFinish() {
 }
 
 void Dbg::SetJdwpAllowed(bool allowed) {
+  LOG(INFO) << "SetJdwpAllowed:" << allowed;
   gJdwpAllowed = allowed;
 }
 

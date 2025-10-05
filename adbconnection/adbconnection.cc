@@ -90,7 +90,12 @@ static std::optional<AdbConnectionState> gState;
 static std::optional<pthread_t> gPthread;
 
 static bool IsDebuggingPossible() {
-  return art::Dbg::IsJdwpAllowed();
+  //return art::Dbg::IsJdwpAllowed();
+  if( art::Dbg::IsJdwpAllowed() ) {
+    PLOG(ERROR) << "DEBUG: (adbd) IsDebuggingPossible = true";
+    return true;
+  }
+  return false;
 }
 
 // Begin running the debugger.
@@ -496,7 +501,10 @@ bool AdbConnectionState::SetupAdbConnection() {
   };
   const AdbConnectionClientInfo *info_ptrs[] = {&infos[0], &infos[1], &infos[2], &infos[3]};
 
-  while (!shutting_down_) {
+  if(!IsDebuggingPossible()) return false;
+
+  int retry = 10;
+  while (!shutting_down_ && retry > 0) {
     // If adbd isn't running, because USB debugging was disabled or
     // perhaps the system is restarting it for "adb root", the
     // connect() will fail.  We loop here forever waiting for it
@@ -520,6 +528,7 @@ bool AdbConnectionState::SetupAdbConnection() {
     if (sleep_ms > sleep_max_ms) {
       sleep_ms = sleep_max_ms;
     }
+    retry--;
   }
 
   return false;
